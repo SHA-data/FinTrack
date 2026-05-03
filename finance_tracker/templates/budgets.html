@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block title %}Budgets - FinTrack{% endblock %}
+
+{% block content %}
+<div class="mb-6">
+    <h1>Budgets</h1>
+</div>
+
+<div class="layout-sidebar">
+    <!-- Left Column: Form -->
+    <div class="card">
+        <h2 class="card__title">Set a budget</h2>
+        
+        <form method="POST" action="{{ url_for('budgets.update') }}" data-loading data-loading-text="Saving...">
+            <div class="form-group">
+                <label for="category_id" class="form-label">Category</label>
+                <select id="category_id" name="category_id" class="form-select" required>
+                    {% for cat in categories %}
+                        {% if cat.type == 'expense' %}
+                        <option value="{{ cat.category_id }}">{{ cat.name }}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="limit_amount" class="form-label">Monthly limit</label>
+                <input type="number" id="limit_amount" name="limit_amount" class="form-input" min="1" step="0.01" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="month_year" class="form-label">Month</label>
+                <input type="month" id="month_year" name="month_year" class="form-input" required>
+            </div>
+            
+            <button type="submit" class="btn btn--primary mt-2">Set budget</button>
+        </form>
+    </div>
+    
+    <!-- Right Column: List -->
+    <div class="card">
+        <h2 class="card__title">Monthly budgets</h2>
+        
+        {% if budgets and budgets | length > 0 %}
+            {% for budget in budgets %}
+            {% set percentage = [(budget.spent / budget.limit_amount * 100), 100] | min | round | int %}
+            <div class="budget-row">
+                <div class="budget-row__header">
+                    <span class="budget-row__name">
+                        {{ budget.categories.name }}
+                        {% if budget.spent > budget.limit_amount %}
+                            <span class="badge badge--expense" style="margin-left: var(--space-2);">Over budget</span>
+                        {% endif %}
+                    </span>
+                </div>
+                
+                <div class="progress-track">
+                    <div class="progress-fill {% if percentage < 80 %}progress-fill--good{% elif percentage < 100 %}progress-fill--warning{% else %}progress-fill--danger{% endif %}" 
+                         style="width: {{ percentage }}%;"></div>
+                </div>
+                
+                <div class="budget-row__meta">
+                    {{ budget.spent | currency }} spent of {{ budget.limit_amount | currency }} limit
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                No budgets set for this month.
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Default month to current month
+    document.addEventListener('DOMContentLoaded', () => {
+        const monthInput = document.getElementById('month_year');
+        if (monthInput && !monthInput.value) {
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            monthInput.value = `${year}-${month}`;
+        }
+    });
+</script>
+{% endblock %}

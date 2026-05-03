@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}Create Account - FinTrack{% endblock %}
+
+{% block navbar %}{% endblock %}
+{% block flash_messages %}{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+    <div class="card card--centered">
+        <div class="auth-header">
+            <div class="auth-logo"></div>
+            <h1>Create your account</h1>
+            <p class="text-body" style="color: var(--color-text-secondary); margin-top: var(--space-2);">Start managing your finances today.</p>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="mb-5">
+                {% for category, message in messages %}
+                    <div class="flash flash--{{ category }} mb-2">
+                        <span>{{ message }}</span>
+                        <button class="flash__dismiss" aria-label="Dismiss">&times;</button>
+                    </div>
+                {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="{{ url_for('auth.register') }}" data-loading data-loading-text="Creating account...">
+            <div class="form-group">
+                <label for="username" class="form-label">Username</label>
+                <input type="text" id="username" name="username" class="form-input" autocomplete="username" autofocus required>
+            </div>
+            
+            <div class="form-group">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" id="email" name="email" class="form-input" autocomplete="email" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="register-password" class="form-label">Password</label>
+                <div class="password-wrapper">
+                    <input type="password" id="register-password" name="password" class="form-input" autocomplete="new-password" required>
+                    <button type="button" class="password-toggle" aria-label="Toggle password visibility">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                    </button>
+                </div>
+                <div class="pw-strength">
+                    <div id="pw-strength-bar" class="pw-strength__bar"></div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="confirm_password" class="form-label">Confirm Password</label>
+                <input type="password" id="confirm_password" name="confirm_password" class="form-input" autocomplete="new-password" required>
+            </div>
+            
+            <button type="submit" class="btn btn--primary mt-4">Create account</button>
+        </form>
+        
+        <div class="text-center mt-6">
+            <a href="{{ url_for('auth.login') }}" class="btn--text" style="font-size: 14px;">Already have an account? Sign in</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}AI Insights - FinTrack{% endblock %}
+
+{% block content %}
+<div style="max-width: 720px; margin: 0 auto;">
+    <div class="mb-6">
+        <h1>AI Financial Insights</h1>
+    </div>
+
+    <!-- Generate Section -->
+    <div class="card mb-6">
+        <h2 class="card__title mb-2">Get Personalised Advice</h2>
+        <p class="text-body mb-4" style="color: var(--color-text-secondary);">
+            Claude analyses your current month's spending and gives you personalised advice.
+        </p>
+        <form method="POST" action="{{ url_for('insights.generate') }}" onsubmit="this.querySelector('button').disabled=true; this.querySelector('button').textContent='Analysing…'; this.querySelector('button').style.opacity='0.7';">
+            <button type="submit" class="btn btn--primary">Analyse my finances</button>
+        </form>
+    </div>
+
+    <!-- Latest Insight -->
+    {% if insights and insights | length > 0 %}
+        <div class="card insight-card mb-6">
+            <span class="insight-card__label">Latest insight</span>
+            <div class="insight-card__text">{{ insights[0].insight_text }}</div>
+            <div class="insight-card__meta">
+                Generated on {{ insights[0].generated_at | datetimeformat }}
+            </div>
+        </div>
+        
+        <!-- History -->
+        {% if insights | length > 1 %}
+            <div class="mb-4">
+                <h2>Previous insights</h2>
+            </div>
+            
+            {% for insight in insights[1:] %}
+                <details>
+                    <summary>
+                        <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                        Generated on {{ insight.generated_at | datetimeformat }}
+                    </summary>
+                    <div class="details-content">{{ insight.insight_text }}</div>
+                </details>
+            {% endfor %}
+        {% endif %}
+    {% else %}
+        <div class="empty-state">
+            No insights generated yet. Click the button above to get your first analysis.
+        </div>
+    {% endif %}
+
+</div>
+{% endblock %}

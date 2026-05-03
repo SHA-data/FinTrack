@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Finance Tracker{% endblock %}</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Main CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    {% block navbar %}
+    <nav class="navbar">
+        <div class="navbar__brand">
+            <div class="navbar__logo"></div>
+            <span class="navbar__title">FinTrack</span>
+        </div>
+        
+        <button class="navbar__hamburger" id="hamburger" aria-label="Toggle navigation">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+        </button>
+
+        <div class="navbar__links" id="nav-links">
+            {% if session.user_id %}
+                <a href="{{ url_for('dashboard.index') }}" class="navbar__link {% if request.endpoint == 'dashboard.index' %}navbar__link--active{% endif %}">Dashboard</a>
+                <a href="{{ url_for('transactions.index') }}" class="navbar__link {% if request.endpoint == 'transactions.index' %}navbar__link--active{% endif %}">Transactions</a>
+                <a href="{{ url_for('budgets.index') }}" class="navbar__link {% if request.endpoint == 'budgets.index' %}navbar__link--active{% endif %}">Budgets</a>
+                <a href="{{ url_for('insights.history') }}" class="navbar__link {% if request.endpoint.startswith('insights') %}navbar__link--active{% endif %}">Insights</a>
+                
+                <div class="navbar__user" style="margin-left: auto; display: flex; align-items: center; gap: var(--space-3);">
+                    <span>{{ session.username }}</span>
+                    <a href="{{ url_for('auth.logout') }}" class="btn btn--text">Log out</a>
+                </div>
+            {% else %}
+                <div style="margin-left: auto; display: flex; align-items: center; gap: var(--space-3);">
+                    <a href="{{ url_for('auth.login') }}" class="navbar__link">Log in</a>
+                    <a href="{{ url_for('auth.register') }}" class="navbar__link">Register</a>
+                </div>
+            {% endif %}
+        </div>
+    </nav>
+    {% endblock %}
+
+    <div class="flash-container container">
+        {% block flash_messages %}
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="flash flash--{{ category }}">
+                            <span>{{ message }}</span>
+                            <button class="flash__dismiss" aria-label="Dismiss">&times;</button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        {% endblock %}
+    </div>
+
+    <main id="main-content" class="main-content container">
+        {% block content %}{% endblock %}
+    </main>
+
+    {% if session.user_id %}
+    <footer class="footer">
+        <p>FinTrack — Personal Finance Tracker</p>
+    </footer>
+    {% endif %}
+
+    <!-- Main JS -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

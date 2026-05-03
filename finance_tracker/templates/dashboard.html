@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - FinTrack{% endblock %}
+
+{% block content %}
+<div class="dashboard-header mb-6">
+    <h1>Dashboard</h1>
+</div>
+
+<div class="grid-3 mb-6">
+    <div class="card">
+        <span class="card__label">Total Income</span>
+        <div class="text-metric text-income">{{ summary.total_income | currency }}</div>
+    </div>
+    <div class="card">
+        <span class="card__label">Total Expenses</span>
+        <div class="text-metric text-expense">{{ summary.total_expense | currency }}</div>
+    </div>
+    <div class="card">
+        <span class="card__label">Net Balance</span>
+        <div class="text-metric {% if summary.net_balance >= 0 %}text-income{% else %}text-expense{% endif %}">
+            {{ summary.net_balance | currency }}
+        </div>
+    </div>
+</div>
+
+<div class="grid-2 mb-6">
+    <div class="card">
+        <h2 class="card__title">Spending by category</h2>
+        {% if breakdown and breakdown | length > 0 %}
+            <div style="max-width: 250px; margin: 0 auto;">
+                <canvas id="categoryChart"></canvas>
+            </div>
+            <div id="categoryLegend" class="custom-legend"></div>
+        {% else %}
+            <div class="empty-state">No expense data available for this month.</div>
+        {% endif %}
+    </div>
+    <div class="card">
+        <h2 class="card__title">Monthly trend</h2>
+        {% if summary and summary.total_income > 0 or summary.total_expense > 0 %}
+            <div style="max-width: 100%; margin: 0 auto;">
+                <canvas id="monthlyChart"></canvas>
+            </div>
+        {% else %}
+            <div class="empty-state">No trend data available.</div>
+        {% endif %}
+    </div>
+</div>
+
+{% if alerts and alerts | length > 0 %}
+<div class="budget-alerts mb-6">
+    <h2 class="mb-4">Budget alerts</h2>
+    {% for alert in alerts %}
+    <div class="alert-banner">
+        <div class="alert-banner__text">
+            <strong>{{ alert.categories.name }}</strong> — spent {{ alert.spent | currency }} of {{ alert.limit_amount | currency }} limit
+        </div>
+        <div class="badge badge--expense">Over budget</div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block extra_js %}
+<!-- Pass server data to JS safely -->
+<script type="application/json" id="categoryBreakdownData">
+    {{ breakdown | tojson | safe }}
+</script>
+
+<script type="application/json" id="monthlySummaryData">
+    [
+        {
+            "month": "Current",
+            "income": {{ summary.total_income }},
+            "expense": {{ summary.total_expense }}
+        }
+    ]
+</script>
+{% endblock %}
