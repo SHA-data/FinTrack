@@ -2,8 +2,6 @@
 
 FinTrack is a comprehensive, modern personal finance management application built with **Flask**, **PostgreSQL (via Supabase)**, and **Groq AI**. It empowers users to take control of their financial life through intuitive transaction tracking, proactive budgeting, and personalized AI-driven financial insights.
 
-![FinTrack Dashboard](https://raw.githubusercontent.com/placeholder-path-to-dashboard-image.png)
-
 ## 🚀 Key Features
 
 - **🔐 Secure Authentication**: Robust user signup and login system with encrypted passwords using Werkzeug.
